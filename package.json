@@ -1,6 +1,6 @@
 {
   "name": "inccsv",
-  "version": "0.1.0-draft",
+  "version": "0.1.0",
   "description": "JavaScript implementation of the INC file format.",
   "type": "module",
   "main": "./src/index.js",
@@ -8,15 +8,44 @@
     ".": "./src/index.js",
     "./fs": "./src/fs.js"
   },
+  "files": [
+    "src/",
+    "docs/",
+    "scripts/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "RELEASE.md",
+    "SECURITY.md"
+  ],
   "scripts": {
     "docs": "node scripts/docs-server.js",
+    "pack:check": "npm pack --dry-run",
+    "prepublishOnly": "npm test",
+    "release:check": "npm test && npm pack --dry-run",
     "test": "node --test"
   },
   "keywords": [
     "inc",
     "csv",
     "metadata",
-    "ini"
+    "ini",
+    "tabular-data",
+    "self-describing-data"
   ],
-  "license": "MIT"
+  "author": "Matthew Roughan",
+  "license": "MIT",
+  "homepage": "https://github.com/mroughan/IncCSV.js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mroughan/IncCSV.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mroughan/IncCSV.js/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false
 }

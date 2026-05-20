@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out IncCSV.js
+        uses: actions/checkout@v4
+        with:
+          path: IncCSV.js
+
+      - name: Check out INC specification fixtures
+        uses: actions/checkout@v4
+        with:
+          repository: mroughan/INCspec
+          path: INCspec
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Test
+        working-directory: IncCSV.js
+        run: npm test
+
+      - name: Check package contents
+        working-directory: IncCSV.js
+        run: npm pack --dry-run

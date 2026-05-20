@@ -7,6 +7,8 @@ INC files are ordinary CSV files with an optional, lightweight metadata block at
 the top. This package parses and writes INC text in browsers and Node.js. Node
 file helpers are available from the `inccsv/fs` export.
 
+Package name: [`inccsv`](https://www.npmjs.com/package/inccsv).
+
 See also the Julia implementation
 [`IncCSV.jl`](https://github.com/mroughan/IncCSV.jl) and the Python
 implementation [`IncCSV.py`](https://github.com/lewismath/IncCSV.py).
@@ -27,6 +29,14 @@ npm run docs
 ```
 
 Then open `http://127.0.0.1:4173/docs/`.
+
+## Installation
+
+After publication to npm:
+
+```sh
+npm install inccsv
+```
 
 ## Usage
 
@@ -84,3 +94,18 @@ npm test
 ```
 
 The test harness reads fixtures from `../INCspec`.
+
+Before publishing a release, run:
+
+```sh
+npm run release:check
+```
+
+Release notes and the publishing checklist are maintained in
+[`CHANGELOG.md`](CHANGELOG.md) and [`RELEASE.md`](RELEASE.md).
+
+## Disclosure
+
+This package was developed with assistance from OpenAI Codex, an AI coding
+assistant based on GPT-5. Code design decisions were human mediated, and the
+resulting code was manually reviewed.

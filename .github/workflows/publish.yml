@@ -1,0 +1,39 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out IncCSV.js
+        uses: actions/checkout@v4
+        with:
+          path: IncCSV.js
+
+      - name: Check out INC specification fixtures
+        uses: actions/checkout@v4
+        with:
+          repository: mroughan/INCspec
+          path: INCspec
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Release check
+        working-directory: IncCSV.js
+        run: npm run release:check
+
+      - name: Publish to npm
+        working-directory: IncCSV.js
+        run: npm publish --access public
