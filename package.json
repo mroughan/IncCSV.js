@@ -1,0 +1,21 @@
+{
+  "name": "inccsv",
+  "version": "0.1.0-draft",
+  "description": "JavaScript implementation of the INC file format.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./fs": "./src/fs.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "inc",
+    "csv",
+    "metadata",
+    "ini"
+  ],
+  "license": "MIT"
+}
