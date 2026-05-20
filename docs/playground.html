@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IncCSV.js Playground</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">IncCSV.js</div>
+      <nav class="nav" aria-label="Documentation">
+        <a href="./index.html">Overview</a>
+        <a href="./playground.html" aria-current="page">Playground</a>
+        <a href="./schema.html">Schema</a>
+        <a href="./examples.html">Examples</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Parser and writer playground</h1>
+      <p class="lede">
+        Edit the INC text, parse it, inspect the metadata and rows, then write
+        the parsed object back to canonical INC text.
+      </p>
+
+      <div class="toolbar">
+        <label for="sample">Sample</label>
+        <select id="sample">
+          <option value="basic">Basic INC</option>
+          <option value="semicolon">Semicolon structure</option>
+          <option value="metadata">Metadata edge cases</option>
+          <option value="plainCsv">Plain CSV</option>
+        </select>
+        <button id="parse">Parse</button>
+        <button id="write" class="secondary">Write canonical text</button>
+      </div>
+
+      <section class="workspace">
+        <div class="panel">
+          <h2>Input</h2>
+          <textarea id="input" spellcheck="false"></textarea>
+          <div id="status" class="status" aria-live="polite"></div>
+        </div>
+        <div class="panel">
+          <h2>Metadata</h2>
+          <pre id="metadata" class="output"></pre>
+          <h2>Rows</h2>
+          <div id="rows"></div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { parseInc, writeInc } from "../src/index.js";
+      import { examples } from "./demo-data.js";
+      import { renderMetadata, renderRows, showError, showOk } from "./demo-ui.js";
+
+      const input = document.querySelector("#input");
+      const sample = document.querySelector("#sample");
+      const metadata = document.querySelector("#metadata");
+      const rows = document.querySelector("#rows");
+      const status = document.querySelector("#status");
+      let lastFile = null;
+
+      function loadSample() {
+        input.value = examples[sample.value];
+        parse();
+      }
+
+      function parse() {
+        try {
+          lastFile = parseInc(input.value);
+          metadata.textContent = renderMetadata(lastFile.metadata);
+          rows.innerHTML = renderRows(lastFile);
+          showOk(status, `Parsed ${lastFile.rows.length} row(s) and ${lastFile.columns.length} column(s).`);
+        } catch (error) {
+          lastFile = null;
+          metadata.textContent = "";
+          rows.innerHTML = "";
+          showError(status, error);
+        }
+      }
+
+      function writeCanonical() {
+        if (!lastFile) {
+          parse();
+        }
+        if (lastFile) {
+          input.value = writeInc(lastFile);
+          parse();
+        }
+      }
+
+      sample.addEventListener("change", loadSample);
+      document.querySelector("#parse").addEventListener("click", parse);
+      document.querySelector("#write").addEventListener("click", writeCanonical);
+      input.addEventListener("input", parse);
+      loadSample();
+    </script>
+  </body>
+</html>

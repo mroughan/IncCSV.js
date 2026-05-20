@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IncCSV.js Schema Demo</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">IncCSV.js</div>
+      <nav class="nav" aria-label="Documentation">
+        <a href="./index.html">Overview</a>
+        <a href="./playground.html">Playground</a>
+        <a href="./schema.html" aria-current="page">Schema</a>
+        <a href="./examples.html">Examples</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Mini-schema validation</h1>
+      <p class="lede">
+        The schema is itself an INC file. It declares required, optional, and
+        forbidden metadata paths.
+      </p>
+
+      <div class="toolbar">
+        <button id="validate">Validate</button>
+        <button id="make-invalid" class="secondary">Remove required metadata</button>
+        <button id="reset" class="secondary">Reset</button>
+      </div>
+
+      <section class="workspace">
+        <div class="panel">
+          <h2>INC file</h2>
+          <textarea id="inc" class="short-textarea" spellcheck="false"></textarea>
+          <h2>Schema</h2>
+          <textarea id="schema" class="short-textarea" spellcheck="false"></textarea>
+        </div>
+        <div class="panel">
+          <h2>Validation result</h2>
+          <div id="status" class="status" aria-live="polite"></div>
+          <pre id="result" class="output"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { parseInc, readSchemaFromText, validateSchema } from "../src/index.js";
+      import { examples, schemaText } from "./demo-data.js";
+      import { showError, showOk } from "./demo-ui.js";
+
+      const inc = document.querySelector("#inc");
+      const schema = document.querySelector("#schema");
+      const result = document.querySelector("#result");
+      const status = document.querySelector("#status");
+
+      function reset() {
+        inc.value = examples.basic;
+        schema.value = schemaText;
+        validate();
+      }
+
+      function validate() {
+        try {
+          const file = parseInc(inc.value);
+          const schemaObject = readSchemaFromText(schema.value);
+          const report = validateSchema(file, schemaObject);
+          result.textContent = JSON.stringify(report, null, 2);
+          if (report.valid) {
+            showOk(status, "Metadata satisfies the schema.");
+          } else {
+            status.textContent = "Metadata does not satisfy the schema.";
+            status.className = "status bad";
+          }
+        } catch (error) {
+          result.textContent = "";
+          showError(status, error);
+        }
+      }
+
+      function makeInvalid() {
+        inc.value = inc.value.replace("[columns]\ntemperature = Celsius\n", "");
+        validate();
+      }
+
+      document.querySelector("#validate").addEventListener("click", validate);
+      document.querySelector("#make-invalid").addEventListener("click", makeInvalid);
+      document.querySelector("#reset").addEventListener("click", reset);
+      inc.addEventListener("input", validate);
+      schema.addEventListener("input", validate);
+      reset();
+    </script>
+  </body>
+</html>

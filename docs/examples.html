@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IncCSV.js Examples</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">IncCSV.js</div>
+      <nav class="nav" aria-label="Documentation">
+        <a href="./index.html">Overview</a>
+        <a href="./playground.html">Playground</a>
+        <a href="./schema.html">Schema</a>
+        <a href="./examples.html" aria-current="page">Examples</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Examples in practice</h1>
+      <p class="lede">
+        Pick a sample to see the exact input text, parsed metadata, and CSV
+        rows side by side.
+      </p>
+
+      <section class="example-list">
+        <div class="example-buttons" id="buttons"></div>
+        <div class="panel">
+          <h2 id="title">Example</h2>
+          <textarea id="source" class="short-textarea" spellcheck="false" readonly></textarea>
+          <h2>Metadata</h2>
+          <pre id="metadata" class="output"></pre>
+          <h2>Rows</h2>
+          <div id="rows"></div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      import { parseInc } from "../src/index.js";
+      import { examples } from "./demo-data.js";
+      import { escapeHtml, renderMetadata, renderRows } from "./demo-ui.js";
+
+      const labels = {
+        basic: "Basic INC",
+        semicolon: "Semicolon structure",
+        metadata: "Metadata edge cases",
+        plainCsv: "Plain CSV passthrough",
+      };
+      const buttons = document.querySelector("#buttons");
+      const source = document.querySelector("#source");
+      const metadata = document.querySelector("#metadata");
+      const rows = document.querySelector("#rows");
+      const title = document.querySelector("#title");
+
+      for (const key of Object.keys(examples)) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = labels[key];
+        button.dataset.key = key;
+        button.addEventListener("click", () => showExample(key));
+        buttons.append(button);
+      }
+
+      function showExample(key) {
+        for (const button of buttons.querySelectorAll("button")) {
+          button.classList.toggle("active", button.dataset.key === key);
+        }
+        const file = parseInc(examples[key]);
+        title.innerHTML = escapeHtml(labels[key]);
+        source.value = examples[key];
+        metadata.textContent = renderMetadata(file.metadata);
+        rows.innerHTML = renderRows(file);
+      }
+
+      showExample("basic");
+    </script>
+  </body>
+</html>

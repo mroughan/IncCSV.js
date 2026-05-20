@@ -11,6 +11,23 @@ See also the Julia implementation
 [`IncCSV.jl`](https://github.com/mroughan/IncCSV.jl) and the Python
 implementation [`IncCSV.py`](https://github.com/lewismath/IncCSV.py).
 
+## Documentation
+
+Static documentation and browser demos live in [`docs/`](docs/):
+
+- [Overview](docs/index.html): API quick reference and INC file anatomy.
+- [Playground](docs/playground.html): parse, inspect, and write INC text.
+- [Schema demo](docs/schema.html): validate metadata with an INC mini-schema.
+- [Examples](docs/examples.html): rendered examples for common INC patterns.
+
+Run the local docs server from this package directory:
+
+```sh
+npm run docs
+```
+
+Then open `http://127.0.0.1:4173/docs/`.
+
 ## Usage
 
 ```js

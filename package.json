@@ -9,6 +9,7 @@
     "./fs": "./src/fs.js"
   },
   "scripts": {
+    "docs": "node scripts/docs-server.js",
     "test": "node --test"
   },
   "keywords": [

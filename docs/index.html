@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IncCSV.js Documentation</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">IncCSV.js</div>
+      <nav class="nav" aria-label="Documentation">
+        <a href="./index.html" aria-current="page">Overview</a>
+        <a href="./playground.html">Playground</a>
+        <a href="./schema.html">Schema</a>
+        <a href="./examples.html">Examples</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <h1>INC files in JavaScript</h1>
+          <p class="lede">
+            IncCSV.js reads and writes CSV data with a small metadata block,
+            using the language-neutral INC specification as its contract.
+          </p>
+          <div class="actions">
+            <a class="button" href="./playground.html">Open playground</a>
+            <a class="button secondary" href="./schema.html">Validate metadata</a>
+          </div>
+        </div>
+        <div class="anatomy" aria-label="INC file anatomy">
+          <div class="anatomy-row">
+            <div class="anatomy-label delim">Delimiter</div>
+            <pre class="anatomy-code">---</pre>
+          </div>
+          <div class="anatomy-row">
+            <div class="anatomy-label meta">Metadata</div>
+            <pre class="anatomy-code">title = Sensor readings
+[columns]
+temperature = Celsius</pre>
+          </div>
+          <div class="anatomy-row">
+            <div class="anatomy-label delim">Delimiter</div>
+            <pre class="anatomy-code">---</pre>
+          </div>
+          <div class="anatomy-row">
+            <div class="anatomy-label csv">CSV</div>
+            <pre class="anatomy-code">time,temperature
+0,21.4
+1,21.8</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="Package capabilities">
+        <article class="card">
+          <h2>Parse</h2>
+          <p>
+            Use <code>parseInc(text)</code> in browsers or Node.js. Plain CSV
+            is accepted and returns empty metadata.
+          </p>
+          <pre class="output">import { parseInc } from "inccsv";
+
+const file = parseInc(text);
+console.log(file.metadata);
+console.log(file.rows);</pre>
+        </article>
+        <article class="card">
+          <h2>Write</h2>
+          <p>
+            Use <code>writeInc</code> to serialize metadata, columns, and rows
+            with deterministic metadata ordering.
+          </p>
+          <pre class="output">import { writeInc } from "inccsv";
+
+const text = writeInc({
+  metadata,
+  columns,
+  rows,
+});</pre>
+        </article>
+        <article class="card">
+          <h2>Validate</h2>
+          <p>
+            Read mini-schema text and check metadata requirements before a file
+            enters a workflow.
+          </p>
+          <pre class="output">const schema = readSchemaFromText(schemaText);
+const result = validateSchema(file, schema);</pre>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
