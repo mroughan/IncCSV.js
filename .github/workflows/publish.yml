@@ -30,6 +30,10 @@ jobs:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Install dependencies
+        working-directory: IncCSV.js
+        run: npm ci
+
       - name: Release check
         working-directory: IncCSV.js
         run: npm run release:check

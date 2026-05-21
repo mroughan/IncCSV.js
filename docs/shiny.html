@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IncCSV.js Shiny Integration</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">IncCSV.js</div>
+      <nav class="nav" aria-label="Documentation">
+        <a href="./index.html">Overview</a>
+        <a href="./playground.html">Playground</a>
+        <a href="./schema.html">Schema</a>
+        <a href="./examples.html">Examples</a>
+        <a href="./shiny.html" aria-current="page">Shiny</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Use IncCSV.js from R Shiny</h1>
+      <p class="lede">
+        Shiny can load the browser bundle, parse INC files in the browser, and
+        send the parsed object to the R server with <code>Shiny.setInputValue</code>.
+      </p>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Build</h2>
+          <p>Build the global browser bundle before running the example app.</p>
+          <pre class="output">npm install
+npm run build</pre>
+        </article>
+        <article class="card">
+          <h2>Load</h2>
+          <p>The Shiny UI loads the bundle and a small app-specific bridge.</p>
+          <pre class="output">tags$script(src = "inccsv.browser.js")
+tags$script(src = "inc-shiny.js")</pre>
+        </article>
+        <article class="card">
+          <h2>Send</h2>
+          <p>The browser sends parsed INC data to the Shiny server.</p>
+          <pre class="output">const file = window.IncCSV.parseInc(text);
+Shiny.setInputValue("inc_file", file, {
+  priority: "event"
+});</pre>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>Example App</h2>
+        <p>
+          A complete Shiny example is included in
+          <code>examples/shiny/</code>. Run it from that directory:
+        </p>
+        <pre class="output">R -e 'shiny::runApp(".")'</pre>
+      </section>
+    </main>
+  </body>
+</html>

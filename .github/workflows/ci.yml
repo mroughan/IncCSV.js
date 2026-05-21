@@ -25,10 +25,10 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Test
+      - name: Install dependencies
         working-directory: IncCSV.js
-        run: npm test
+        run: npm ci
 
-      - name: Check package contents
+      - name: Release check
         working-directory: IncCSV.js
-        run: npm pack --dry-run
+        run: npm run release:check

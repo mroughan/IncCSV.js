@@ -8,6 +8,7 @@ Pages:
 - `playground.html`: interactive INC parser and writer.
 - `schema.html`: mini-schema validation demo.
 - `examples.html`: sample files rendered as metadata and CSV rows.
+- `shiny.html`: R Shiny integration notes.
 
 The pages import the package source modules directly. Use the local docs server
 from the package root:

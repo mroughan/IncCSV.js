@@ -21,6 +21,7 @@ Static documentation and browser demos live in [`docs/`](docs/):
 - [Playground](docs/playground.html): parse, inspect, and write INC text.
 - [Schema demo](docs/schema.html): validate metadata with an INC mini-schema.
 - [Examples](docs/examples.html): rendered examples for common INC patterns.
+- [Shiny](docs/shiny.html): use the browser bundle from an R Shiny app.
 
 Run the local docs server from this package directory:
 
@@ -70,6 +71,31 @@ import { readInc, writeIncFile } from "inccsv/fs";
 
 const file = await readInc("data.inc");
 await writeIncFile("copy.inc", file);
+```
+
+## Browser Bundle And Shiny
+
+Build a browser-ready global bundle with:
+
+```sh
+npm run build
+```
+
+This writes:
+
+```text
+dist/inccsv.browser.js
+dist/inccsv.browser.min.js
+```
+
+Both expose the package as `window.IncCSV`. A complete R Shiny example is
+included in [`examples/shiny/`](examples/shiny/). The build script also copies
+the browser bundle into `examples/shiny/www/` so the app can serve it as a
+normal Shiny asset:
+
+```sh
+cd examples/shiny
+R -e 'shiny::runApp(".")'
 ```
 
 ## Current Scope

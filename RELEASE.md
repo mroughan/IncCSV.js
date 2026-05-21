@@ -49,6 +49,7 @@ This document describes how to release IncCSV.js as the npm package `inccsv`.
 4. Run the release checks:
 
    ```sh
+   npm ci
    npm run release:check
    ```
 
@@ -65,20 +66,20 @@ This document describes how to release IncCSV.js as the npm package `inccsv`.
 
    ```sh
    git add package.json README.md CHANGELOG.md RELEASE.md
-   git commit -m "Release v0.1.0"
+   git commit -m "Release v0.1.1"
    ```
 
 7. Create a git tag:
 
    ```sh
-   git tag v0.1.0
+   git tag v0.1.1
    ```
 
 8. Push the commit and tag:
 
    ```sh
    git push origin main
-   git push origin v0.1.0
+   git push origin v0.1.1
    ```
 
 9. Create a GitHub release for the same tag. If trusted publishing is
@@ -105,7 +106,7 @@ npm pack
 mkdir -p /tmp/inccsv-install-check
 cd /tmp/inccsv-install-check
 npm init -y
-npm install /home/matt/Dropbox/src/INC/IncCSV.js/inccsv-0.1.0.tgz
+npm install /home/matt/Dropbox/src/INC/IncCSV.js/inccsv-0.1.1.tgz
 node --input-type=module -e 'import { parseInc } from "inccsv"; console.log(parseInc("a,b\n1,2\n").rows)'
 ```
 
@@ -114,5 +115,7 @@ node --input-type=module -e 'import { parseInc } from "inccsv"; console.log(pars
 - `prepublishOnly` runs `npm test` before `npm publish`.
 - The `files` field in `package.json` controls the npm package contents.
 - Documentation demos are static files and are included in the package.
+- Browser bundles in `dist/` are generated with `npm run build` and included in
+  the package.
 - CI expects the INC specification fixtures to be available from
   `mroughan/INCspec`.

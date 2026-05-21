@@ -7,6 +7,7 @@ Thank you for helping improve IncCSV.js.
 Use Node.js 20 or newer.
 
 ```sh
+npm install
 npm test
 ```
 
