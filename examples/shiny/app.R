@@ -35,7 +35,14 @@ ui <- fluidPage(
         )
       ),
       br(),
-      actionButton("parse_inc", "Parse INC text", class = "btn-primary")
+      actionButton("parse_inc", "Parse INC text", class = "btn-primary"),
+      tags$hr(),
+      tags$strong("Browser status"),
+      tags$div(
+        id = "inc_client_status",
+        class = "text-muted",
+        "Waiting for IncCSV.js..."
+      )
     ),
     mainPanel(
       h3("Parse status"),
@@ -93,10 +100,10 @@ server <- function(input, output, session) {
 
     columns <- unlist(file$columns, use.names = FALSE)
     rows <- lapply(file$rows, function(row) {
-      values <- lapply(columns, function(column) {
+      values <- vapply(columns, function(column) {
         value <- row[[column]]
         if (is.null(value)) "" else as.character(value)
-      })
+      }, character(1))
       names(values) <- columns
       values
     })
