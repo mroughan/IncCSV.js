@@ -33,7 +33,11 @@ export function schemaFromMetadata(metadata) {
     ["MUST_NOT", Object.keys(schema.mustNot)],
   ]) {
     for (const path of paths) {
-      if (path.split(".").length > 2) {
+      const components = path.split(".");
+      if (components.some((component) => component === "")) {
+        fail(`Schema path ${path} has an empty component.`, "invalid_schema_path");
+      }
+      if (components.length > 2) {
         fail(`Schema path ${path} is too deep.`, "invalid_schema_path");
       }
       if (seen.has(path)) {
@@ -65,12 +69,18 @@ export function validateSchema(file, schema) {
 }
 
 function getSection(metadata, aliases) {
+  const section = {};
   for (const [key, value] of Object.entries(metadata)) {
     if (aliases.has(key.toLowerCase()) && value && typeof value === "object" && !Array.isArray(value)) {
-      return value;
+      for (const [childKey, childValue] of Object.entries(value)) {
+        if (Object.hasOwn(section, childKey)) {
+          fail(`Schema path ${childKey} is duplicated within alias sections.`, "duplicate_schema_requirement");
+        }
+        section[childKey] = childValue;
+      }
     }
   }
-  return {};
+  return section;
 }
 
 function stringifySection(section) {

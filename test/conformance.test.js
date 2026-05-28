@@ -71,6 +71,61 @@ test("roundtrip INC specification tests", async () => {
   }
 });
 
+test("schema aliases within a requirement class are merged", () => {
+  const schema = readSchemaFromText(`---
+[MUST]
+title = string
+[REQUIRED]
+columns.score = number
+[OPTIONAL]
+notes = string
+[MAY]
+operator = string
+---
+title,score
+run,1
+`);
+
+  assert.deepEqual(schema.must, {
+    title: "string",
+    "columns.score": "number",
+  });
+  assert.deepEqual(schema.maybe, {
+    notes: "string",
+    operator: "string",
+  });
+});
+
+test("schema aliases reject duplicate paths within a requirement class", () => {
+  assert.throws(() => readSchemaFromText(`---
+[MUST]
+title = string
+[REQUIRED]
+title = text
+---
+title
+run
+`), { code: "duplicate_schema_requirement" });
+});
+
+test("schema paths reject empty components", () => {
+  assert.throws(() => readSchemaFromText(`---
+[MUST]
+a. = string
+---
+a
+value
+`), { code: "invalid_schema_path" });
+
+  assert.throws(() => readSchemaFromText(`---
+[MUST]
+.key = string
+---
+key
+value
+`), { code: "invalid_schema_path" });
+});
+
 async function loadJson(path) {
   return JSON.parse(await readFile(path, "utf8"));
 }
