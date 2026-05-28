@@ -1,6 +1,6 @@
 {
   "name": "inccsv",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JavaScript implementation of the INC file format.",
   "type": "module",
   "main": "./src/index.js",

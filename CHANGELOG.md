@@ -6,6 +6,12 @@ This project follows semantic versioning once released on npm. During early
 `0.x` releases, minor versions may still include API changes while the INC
 specification and JavaScript API settle.
 
+## 0.1.2 - 2026-05-28
+
+- Merged mini-schema requirement alias sections such as `[MUST]` and
+  `[REQUIRED]`.
+- Rejected mini-schema paths with empty components such as `a.` and `.key`.
+
 ## 0.1.1 - 2026-05-21
 
 - Added a browser bundle build that exposes IncCSV.js as `window.IncCSV`.
