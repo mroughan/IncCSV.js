@@ -157,26 +157,31 @@ var IncCSV = (() => {
     }
     return records;
   }
-  function writeCsv(columns, rows) {
-    const lines = [columns.map(formatCsvField).join(",")];
+  function writeCsv(columns, rows, options = {}) {
+    const delimiter = options.delimiter ?? ",";
+    const quote = options.quotechar ?? '"';
+    const escape = options.escapechar ?? quote;
+    const format = (value) => formatCsvField(value, { delimiter, quote, escape });
+    const lines = [columns.map(format).join(delimiter)];
     for (const row of rows) {
       const fields = columns.map((column) => {
         if (Array.isArray(row)) {
-          return formatCsvField(row[columns.indexOf(column)] ?? "");
+          return format(row[columns.indexOf(column)] ?? "");
         }
-        return formatCsvField(row[column] ?? "");
+        return format(row[column] ?? "");
       });
-      lines.push(fields.join(","));
+      lines.push(fields.join(delimiter));
     }
     return `${lines.join("\n")}
 `;
   }
-  function formatCsvField(value) {
+  function formatCsvField(value, { delimiter, quote, escape }) {
     const text = String(value);
-    if (!/[",\r\n]/.test(text)) {
+    if (!text.includes(delimiter) && !text.includes(quote) && !/[\r\n]/u.test(text)) {
       return text;
     }
-    return `"${text.replaceAll('"', '""')}"`;
+    const escaped = escape === quote ? text.replaceAll(quote, `${quote}${quote}`) : text.replaceAll(escape, `${escape}${escape}`).replaceAll(quote, `${escape}${quote}`);
+    return `${quote}${escaped}${quote}`;
   }
 
   // src/parser.js
@@ -373,15 +378,51 @@ var IncCSV = (() => {
   }
 
   // src/writer.js
-  function writeInc({ metadata = {}, columns = [], rows = [] }) {
+  var WRITER_STRUCTURE_KEYS = /* @__PURE__ */ new Set(["delimiter", "quotechar", "escapechar"]);
+  function writeInc({ metadata = {}, columns = [], rows = [], csvOptions = {} }) {
     const metadataText = writeMetadata(metadata);
-    const csvText = writeCsv(columns, rows);
+    const csvText = writeCsv(columns, rows, csvWriteOptions(metadata, csvOptions));
     if (metadataText === "") {
       return csvText;
     }
     return `---
 ${metadataText}---
 ${csvText}`;
+  }
+  function csvWriteOptions(metadata, csvOptions) {
+    const options = {};
+    const structure = metadata.structure;
+    if (structure !== void 0) {
+      if (!isSection(structure)) {
+        fail("[structure] must be a section.", "invalid_structure_value");
+      }
+      const delimiterValue = structure.delimiter ?? structure.delim;
+      if (delimiterValue !== void 0) {
+        options.delimiter = coerceCharacter2(delimiterValue);
+      }
+      if (structure.quotechar !== void 0) {
+        options.quotechar = coerceCharacter2(structure.quotechar);
+      }
+      if (structure.escapechar !== void 0) {
+        options.escapechar = coerceCharacter2(structure.escapechar);
+      }
+    }
+    const explicit = { ...csvOptions };
+    if (explicit.delim !== void 0 && explicit.delimiter === void 0) {
+      explicit.delimiter = explicit.delim;
+      delete explicit.delim;
+    }
+    for (const [key, value] of Object.entries(explicit)) {
+      const normalized = WRITER_STRUCTURE_KEYS.has(key) ? coerceCharacter2(value) : value;
+      if (WRITER_STRUCTURE_KEYS.has(key) && options[key] !== void 0 && options[key] !== normalized) {
+        fail(
+          `CSV write option ${key} conflicts with [structure] metadata.`,
+          "conflicting_structure_option"
+        );
+      }
+      options[key] = normalized;
+    }
+    return options;
   }
   function writeMetadata(metadata) {
     const lines = [];
@@ -414,6 +455,27 @@ ${csvText}`;
       return `"${text.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
     }
     return text;
+  }
+  function coerceCharacter2(value) {
+    if (Number.isInteger(value)) {
+      return String.fromCodePoint(value);
+    }
+    if (typeof value !== "string") {
+      fail("Structure character value must be a string or integer.", "invalid_structure_value");
+    }
+    if (value === "tab" || value === "\\t") {
+      return "	";
+    }
+    if (value === "space") {
+      return " ";
+    }
+    if (/^\d+$/u.test(value)) {
+      return String.fromCodePoint(Number.parseInt(value, 10));
+    }
+    if ([...value].length !== 1) {
+      fail("Structure character value must resolve to one character.", "invalid_structure_value");
+    }
+    return value;
   }
 
   // src/schema.js

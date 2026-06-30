@@ -64,6 +64,20 @@ const text = writeInc({
 });
 ```
 
+When metadata includes writer-relevant `[structure]` values, `writeInc` uses
+them for the CSV component:
+
+```js
+const tsv = writeInc({
+  metadata: { structure: { delimiter: "tab" } },
+  columns: ["time", "temperature"],
+  rows: [[0, 21.4]],
+});
+```
+
+If explicit `csvOptions` contradict `[structure]` metadata, `writeInc` throws
+rather than producing a file whose metadata describes a different CSV format.
+
 For Node file I/O:
 
 ```js
@@ -104,7 +118,8 @@ R -e 'shiny::runApp(".")'
 - Metadata parsing with sections, integer/string values, quoting, and comments.
 - `[structure]` support for delimiter, quote character, escape character,
   comment marker, header, and footerskip.
-- INC writing with deterministic metadata ordering.
+- INC writing with deterministic metadata ordering and structure-aware CSV
+  output.
 - Mini-schema reading and validation.
 - Shared conformance tests for the INC specification fixtures.
 
@@ -112,6 +127,11 @@ This package is intentionally small and dependency-free. It is suitable for
 lightweight browser and Node workflows; applications with highly specialized CSV
 requirements may still prefer to adapt the parser boundary to their CSV library
 of choice.
+
+INC follows a bounded version of Postel's law. Writers emit conservative,
+canonical INC, while readers accept documented compatible variants such as
+plain CSV passthrough and portable aliases. Malformed or ambiguous metadata is
+rejected rather than guessed.
 
 ## Development
 

@@ -71,6 +71,33 @@ test("roundtrip INC specification tests", async () => {
   }
 });
 
+test("writeInc applies writer-relevant structure metadata", () => {
+  const text = writeInc({
+    metadata: {
+      title: "metadata-driven TSV",
+      structure: { delimiter: "tab" },
+    },
+    columns: ["name", "score"],
+    rows: [["Ada", 21], ["Babbage", 12]],
+  });
+
+  assert.match(text, /name\tscore/u);
+  assert.doesNotMatch(text, /name,score/u);
+
+  const parsed = parseInc(text);
+  assert.deepEqual(parsed.columns, ["name", "score"]);
+  assert.deepEqual(rowsAsMatrix(parsed), [["Ada", "21"], ["Babbage", "12"]]);
+});
+
+test("writeInc rejects explicit CSV options that contradict structure metadata", () => {
+  assert.throws(() => writeInc({
+    metadata: { structure: { delimiter: "tab" } },
+    columns: ["name", "score"],
+    rows: [["Ada", 21]],
+    csvOptions: { delimiter: "," },
+  }), { code: "conflicting_structure_option" });
+});
+
 test("schema aliases within a requirement class are merged", () => {
   const schema = readSchemaFromText(`---
 [MUST]

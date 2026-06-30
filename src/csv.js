@@ -128,24 +128,31 @@ export function parseCsvRecords(text, options = {}) {
   return records;
 }
 
-export function writeCsv(columns, rows) {
-  const lines = [columns.map(formatCsvField).join(",")];
+export function writeCsv(columns, rows, options = {}) {
+  const delimiter = options.delimiter ?? ",";
+  const quote = options.quotechar ?? '"';
+  const escape = options.escapechar ?? quote;
+  const format = (value) => formatCsvField(value, { delimiter, quote, escape });
+  const lines = [columns.map(format).join(delimiter)];
   for (const row of rows) {
     const fields = columns.map((column) => {
       if (Array.isArray(row)) {
-        return formatCsvField(row[columns.indexOf(column)] ?? "");
+        return format(row[columns.indexOf(column)] ?? "");
       }
-      return formatCsvField(row[column] ?? "");
+      return format(row[column] ?? "");
     });
-    lines.push(fields.join(","));
+    lines.push(fields.join(delimiter));
   }
   return `${lines.join("\n")}\n`;
 }
 
-function formatCsvField(value) {
+function formatCsvField(value, { delimiter, quote, escape }) {
   const text = String(value);
-  if (!/[",\r\n]/.test(text)) {
+  if (!text.includes(delimiter) && !text.includes(quote) && !/[\r\n]/u.test(text)) {
     return text;
   }
-  return `"${text.replaceAll('"', '""')}"`;
+  const escaped = escape === quote
+    ? text.replaceAll(quote, `${quote}${quote}`)
+    : text.replaceAll(escape, `${escape}${escape}`).replaceAll(quote, `${escape}${quote}`);
+  return `${quote}${escaped}${quote}`;
 }
