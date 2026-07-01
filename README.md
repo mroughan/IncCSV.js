@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./logo.svg" alt="Project Logo" width="200">
+</p>
+
 # IncCSV.js
 
 A JavaScript implementation of the
