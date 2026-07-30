@@ -128,9 +128,9 @@ R -e 'shiny::runApp(".")'
 - Shared conformance tests for the INC specification fixtures.
 
 This package is intentionally small and dependency-free. It is suitable for
-lightweight browser and Node workflows; applications with highly specialized CSV
-requirements may still prefer to adapt the parser boundary to their CSV library
-of choice.
+lightweight browser and Node workflows. Its CSV component is parsed and written
+with PapaParse; applications with highly specialized CSV requirements may still
+prefer to adapt the parser boundary to their CSV library of choice.
 
 INC follows a bounded version of Postel's law. Writers emit conservative,
 canonical INC, while readers accept documented compatible variants such as

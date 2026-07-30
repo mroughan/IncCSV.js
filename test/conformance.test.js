@@ -4,7 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { parseInc, writeInc, readSchemaFromText, validateSchema } from "../src/index.js";
+import { parseInc, writeInc, writeCsv, readSchemaFromText, validateSchema } from "../src/index.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const specRoot = resolve(here, "../../INCspec");
@@ -96,6 +96,47 @@ test("writeInc rejects explicit CSV options that contradict structure metadata",
     rows: [["Ada", 21]],
     csvOptions: { delimiter: "," },
   }), { code: "conflicting_structure_option" });
+});
+
+test("writeCsv preserves positional values for duplicate column names", () => {
+  assert.equal(
+    writeCsv(["name", "score", "score"], [["Ada", "1", "2"]]),
+    "name,score,score\nAda,1,2\n",
+  );
+});
+
+test("writeInc rejects invalid metadata before writing unreadable INC", () => {
+  const table = { columns: ["n"], rows: [{ n: "1" }] };
+  for (const metadata of [
+    { empty: {} },
+    { "bad key": 1 },
+    { section: { "bad key": 1 } },
+    { value: null },
+    { value: true },
+    { value: 1.5 },
+    { value: ["x"] },
+    { value: new Date(0) },
+  ]) {
+    assert.throws(() => writeInc({ metadata, ...table }));
+  }
+});
+
+test("writeInc quotes surrounding whitespace for metadata roundtrip", () => {
+  const text = writeInc({
+    metadata: {
+      blank: " ",
+      leading: " a",
+      trailing: "a ",
+    },
+    columns: ["n"],
+    rows: [{ n: "1" }],
+  });
+
+  assert.deepEqual(parseInc(text).metadata, {
+    blank: " ",
+    leading: " a",
+    trailing: "a ",
+  });
 });
 
 test("schema aliases within a requirement class are merged", () => {

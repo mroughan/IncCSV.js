@@ -1,6 +1,6 @@
 {
   "name": "inccsv",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "JavaScript implementation of the INC file format.",
   "type": "module",
   "main": "./src/index.js",
@@ -53,5 +53,8 @@
   "sideEffects": false,
   "devDependencies": {
     "esbuild": "^0.28.0"
+  },
+  "dependencies": {
+    "papaparse": "^5.5.4"
   }
 }

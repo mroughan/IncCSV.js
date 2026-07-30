@@ -1,5 +1,6 @@
 import { writeCsv } from "./csv.js";
 import { fail } from "./errors.js";
+import { assertName, isSection } from "./metadata.js";
 
 const WRITER_STRUCTURE_KEYS = new Set(["delimiter", "quotechar", "escapechar"]);
 
@@ -55,6 +56,10 @@ function csvWriteOptions(metadata, csvOptions) {
 
 export function writeMetadata(metadata) {
   const lines = [];
+  if (!isSection(metadata)) {
+    fail("Metadata must be an object.", "invalid_metadata_value");
+  }
+
   const scalarKeys = Object.keys(metadata)
     .filter((key) => !isSection(metadata[key]))
     .sort();
@@ -63,12 +68,19 @@ export function writeMetadata(metadata) {
     .sort();
 
   for (const key of scalarKeys) {
+    assertName(key);
     lines.push(`${key} = ${formatMetadataValue(metadata[key])}`);
   }
 
   for (const section of sectionKeys) {
+    assertName(section);
+    const sectionKeys = Object.keys(metadata[section]).sort();
+    if (sectionKeys.length === 0) {
+      fail(`Section [${section}] has no properties.`, "empty_section");
+    }
     lines.push(`[${section}]`);
-    for (const key of Object.keys(metadata[section]).sort()) {
+    for (const key of sectionKeys) {
+      assertName(key);
       lines.push(`${key} = ${formatMetadataValue(metadata[section][key])}`);
     }
   }
@@ -76,19 +88,18 @@ export function writeMetadata(metadata) {
   return lines.length === 0 ? "" : `${lines.join("\n")}\n`;
 }
 
-function isSection(value) {
-  return value && typeof value === "object" && !Array.isArray(value);
-}
-
 function formatMetadataValue(value) {
   if (Number.isInteger(value)) {
     return String(value);
+  }
+  if (typeof value !== "string") {
+    fail("Metadata values must be integers or strings.", "invalid_metadata_value");
   }
   const text = String(value);
   if (/[\r\n]/u.test(text)) {
     fail("Metadata values cannot contain newlines.", "invalid_metadata_value");
   }
-  if (text === "" || /^[-+]?\d+$/u.test(text) || /["\\]/u.test(text)) {
+  if (text === "" || /^\s|\s$/u.test(text) || /^[-+]?\d+$/u.test(text) || /["\\]/u.test(text)) {
     return `"${text.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
   }
   return text;

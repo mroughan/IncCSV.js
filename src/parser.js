@@ -1,5 +1,6 @@
 import { parseCsv } from "./csv.js";
 import { fail } from "./errors.js";
+import { assertName } from "./metadata.js";
 
 const VALID_STRUCTURE_KEYS = new Set([
   "delim",
@@ -34,6 +35,7 @@ export function parseInc(text, options = {}) {
 
 export function parseMetadataLines(lines) {
   const metadata = {};
+  const sectionNames = new Set();
   let sectionName = null;
   let sectionHasProperty = false;
 
@@ -50,10 +52,14 @@ export function parseMetadataLines(lines) {
       }
       sectionName = sectionMatch[1];
       assertName(sectionName);
-      if (Object.hasOwn(metadata, sectionName)) {
+      if (sectionNames.has(sectionName)) {
         fail(`Duplicate section [${sectionName}].`, "duplicate_key");
       }
+      if (Object.hasOwn(metadata, sectionName)) {
+        fail(`Metadata name ${sectionName} is both a key and a section.`, "name_is_key_and_section");
+      }
       metadata[sectionName] = {};
+      sectionNames.add(sectionName);
       sectionHasProperty = false;
       continue;
     }
@@ -141,12 +147,6 @@ function stripInlineComment(value) {
     }
   }
   return value;
-}
-
-function assertName(name) {
-  if (name === "" || /[\s[\]=#;]/u.test(name)) {
-    fail(`Invalid metadata name ${name}.`, "invalid_name");
-  }
 }
 
 function structureOptions(structure = {}, overrides = {}) {

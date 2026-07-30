@@ -6,6 +6,19 @@ This project follows semantic versioning once released on npm. During early
 `0.x` releases, minor versions may still include API changes while the INC
 specification and JavaScript API settle.
 
+## 0.2.0 - 2026-07-31
+
+- Replaced the internal CSV reader/writer with PapaParse.
+- Applied writer-relevant `[structure]` metadata when writing the CSV component
+  and rejected contradictory explicit CSV writer options.
+- Rejected invalid writer metadata before emitting unreadable INC: invalid
+  names, empty sections, non-integer/non-string values, booleans, floats,
+  arrays, objects, dates, and strings containing newlines.
+- Quoted string metadata values with leading or trailing whitespace so they
+  round-trip.
+- Added conformance coverage for key/section-name collisions and
+  structure-driven TSV writing.
+
 ## 0.1.2 - 2026-05-28
 
 - Merged mini-schema requirement alias sections such as `[MUST]` and
